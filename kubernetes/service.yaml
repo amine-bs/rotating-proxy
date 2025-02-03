@@ -9,7 +9,9 @@ spec:
     - protocol: TCP
       port: 5566
       targetPort: 5566
+      name: proxy
     - protocol: TCP
       port: 4444
       targetPort: 4444
+      name: stats
   type: ClusterIP
