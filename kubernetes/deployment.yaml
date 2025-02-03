@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rotating-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rotating-proxy
+  template:
+    metadata:
+      labels:
+        app: rotating-proxy
+    spec:
+      containers:
+      - name: rotating-proxy
+        image: mattes/rotating-proxy:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5566
+        - containerPort: 4444
