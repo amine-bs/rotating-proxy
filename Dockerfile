@@ -1,22 +1,20 @@
-FROM ubuntu:14.04
-MAINTAINER Matthias Kadenbach <matthias.kadenbach@gmail.com>
+FROM alpine:latest
+RUN apk update
 
-RUN echo 'deb http://deb.torproject.org/torproject.org trusty main' | tee /etc/apt/sources.list.d/torproject.list
-RUN gpg --keyserver keys.gnupg.net --recv 886DDD89
-RUN gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
+RUN set -xe \
+    && apk add --no-cache build-base openssl \
+    && wget https://github.com/jech/polipo/archive/master.zip -O polipo.zip \
+    && unzip polipo.zip \
+    && cd polipo-master \
+    && make \
+    && install polipo /usr/local/bin/ \
+    && cd .. \
+    && rm -rf polipo.zip polipo-master \
+    && mkdir -p /usr/share/polipo/www /var/cache/polipo \
+    && apk del build-base openssl
 
-RUN echo 'deb http://ppa.launchpad.net/brightbox/ruby-ng/ubuntu trusty main' | tee /etc/apt/sources.list.d/ruby.list
-RUN gpg --keyserver keyserver.ubuntu.com --recv C3173AA6
-RUN gpg --export 80f70e11f0f0d5f10cb20e62f5da5f09c3173aa6 | apt-key add -
-
-RUN apt-get update && \
-    apt-get install -y tor polipo haproxy ruby2.1 libssl-dev wget curl build-essential zlib1g-dev libyaml-dev libssl-dev && \
-    ln -s /lib/x86_64-linux-gnu/libssl.so.1.0.0 /lib/libssl.so.1.0.0
-
-RUN update-rc.d -f tor remove
-RUN update-rc.d -f polipo remove
-
-RUN gem install excon -v 0.44.4
+RUN apk --no-cache add tor haproxy wget curl zlib-dev openssl-dev ruby &&\
+    gem install excon
 
 ADD start.rb /usr/local/bin/start.rb
 RUN chmod +x /usr/local/bin/start.rb
@@ -29,4 +27,4 @@ ADD uncachable /etc/polipo/uncachable
 
 EXPOSE 5566 4444
 
-CMD /usr/local/bin/start.rb
+CMD ["/bin/sh", "-c", "/usr/local/bin/start.rb"]

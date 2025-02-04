@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: rotating-proxy
-        image: mattes/rotating-proxy:latest
+        image: hackera10/rotating-proxy-ng:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5566
